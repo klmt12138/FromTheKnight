@@ -2,6 +2,7 @@
 #include "Knight.h"
 #include "AudioEngine.h"
 #include "BattleScene.h"
+#include "StopScene.h"
 USING_NS_CC;
 
 Scene* SafeMap::createScene()
@@ -46,7 +47,7 @@ bool SafeMap::init()
 	//create the third layer for the knight and the portal
 	auto* portal_pic = Sprite::create("portal3.png");
 	auto layer_Knight = Knight::create();
-	layer_Knight->_Knight->setPosition(visibleSize.width/2,visibleSize.height/2);
+	layer_Knight->_Knight->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	portal_pic->setPosition(visibleSize.width / 2, visibleSize.height - 150);
 	layer_Knight->bindSprite(portal_pic);
 	layer_Knight->addChild(portal_pic);
@@ -55,11 +56,45 @@ bool SafeMap::init()
 	this->addChild(layer_bg);
 	this->addChild(layer_Knight);
 
+	/*add the UI of Knight's status and the exit button*/
+	auto UI_status = cocostudio::GUIReader::getInstance()->widgetFromJsonFile("UI_status.ExportJson");
+	UI_status->setAnchorPoint(Vec2(0, 0.5));
+	UI_status->setPosition(Vec2(0, visibleSize.height * 0.8));
+	this->addChild(UI_status);
+
+	/*load the UI*/
+	Button* exitBtn = (Button*)Helper::seekWidgetByName(UI_status, "exitBtn");
+	exitBtn->addTouchEventListener([&](Ref* sender, Widget::TouchEventType type) {
+		switch (type)
+		{
+			case ui::Widget::TouchEventType::BEGAN:
+				break;
+			case ui::Widget::TouchEventType::ENDED:
+				Director::getInstance()->end();
+				break;
+			default:
+				break;
+		}
+		});
+
+	Button* pauseBtn = (Button*)Helper::seekWidgetByName(UI_status, "pauseBtn");
+	pauseBtn->addTouchEventListener([&](Ref* sender, Widget::TouchEventType type) {
+		switch (type)
+		{
+			case ui::Widget::TouchEventType::BEGAN:
+				break;
+			case ui::Widget::TouchEventType::ENDED:
+				Director::getInstance()->pushScene(StopSC::createScene());
+				break;
+			default:
+				break;
+		}
+		});
 	return true;
 }
 /*当前目标
-添加血条ui 
-添加菜单按钮
+添加血条ui(status
+添加stop按钮
 添加碰撞检测
 添加移动限制*/
 
